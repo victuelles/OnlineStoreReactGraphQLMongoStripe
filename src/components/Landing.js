@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 //prettier-ignore
 import {Container,Box,Heading,Card,Image,Text,SearchField,Icon,Spinner} from 'gestalt'
-import Strapi from 'strapi-sdk-javascript/build/main'
 import {Link} from 'react-router-dom'
+import Strapi from 'strapi-sdk-javascript/build/main'
 const apiUrl = process.env.API_URL || 'http://localhost:1337'
 const strapi = new Strapi(apiUrl)
 
@@ -82,7 +82,7 @@ class Landing extends Component{
                 justifyContent="center"
                 marginBottom={2}>
                 <Heading>
-                    Food Brands
+                    Beer Brands
                 </Heading>
 
             </Box>
@@ -124,7 +124,7 @@ class Landing extends Component{
                             <Text size="xl">{brand.name}</Text>
                             <Text >{brand.description}</Text>
                             <Text size="xl">
-                                <Link to={`/${brand._id}`}>See Food</Link>
+                                <Link to={`/${brand._id}`}>See Brews</Link>
                             </Text>
                             </Box>
 

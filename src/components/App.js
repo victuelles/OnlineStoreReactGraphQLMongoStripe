@@ -6,6 +6,7 @@ import Signin from './Signin';
 import Signup from './Signup';
 import Checkout from './Checkout';
 import Navbar from './Navbar'
+import Brews from './Brews'
 import './App.css';
 
 const App = () => 
@@ -17,6 +18,7 @@ const App = () =>
           <Route  path={"/signup"} component={Signup}  />
           <Route  path={"/signin"} component={Signin}  />
           <Route  path={"/checkout"} component={Checkout}  />
+          <Route  path={"/:brandId"} component={Brews} />
        </Switch>
       </React.Fragment>
      
