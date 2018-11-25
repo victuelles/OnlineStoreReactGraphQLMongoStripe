@@ -9,7 +9,7 @@ class Brews extends Component {
     state={
         brews:[],
         brand:'',
-        cartItems=[]
+        cartItems:[]
     }
 
     async componentDidMount(){
@@ -45,14 +45,18 @@ class Brews extends Component {
     }
 
     render(){
-        const {brand,brews}=this.state
+        const {brand,brews,cartItems}=this.state
         return(
             <Box
             marginTop={4}
             display="flex"
             justifyContent="center"
             alignItems="start"
-          
+            dangerouslySetInlineStyle={{
+                __style:{
+                    flexWrap:'wrap-reverse'
+                }
+            }}
             >
             {/*Brews sections */}
             <Box display="flex" direction="column" alignItems="center">
@@ -112,6 +116,34 @@ class Brews extends Component {
                     ))}
                 </Box>
             </Box>
+           {/*User Cart*/}
+                <Box alignSelf="end" marginTop={2} marginLeft={8}>
+                    <Mask shape="rounded" wash>
+                        <Box display="flex" direction="column" alignItems="center" padding={2}>
+                        {/* User Cart Heading */}
+                             <Heading align="center" size="md" >Your Cart</Heading>
+                             <Text color="gray" italic>
+                                {cartItems.length} items selected
+                             </Text>
+                            {/*  Cart Items (will add) */}
+
+                            <Box display="flex" alignItems="center" justifyContent="center" direction="column">
+                                <Box margin={2}>
+                                    {cartItems.length===0 &&(
+                                        <Text color="red">Please select some items</Text>
+                                    )}
+                                </Box>
+
+                                <Text size="lg">Total: $3.99</Text>
+                                <Text>
+                                    <Link to="/checkout">Checkout</Link>
+                                </Text>
+                            </Box>
+
+                        </Box>
+                    </Mask>
+                </Box>             
+
             </Box>
         )
     }
