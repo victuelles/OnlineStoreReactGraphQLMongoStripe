@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {Box,Heading,Card,Image,Text,Button,Mask,IconButton} from 'gestalt'
-import {calculatePrice,setCart,getCart} from './utils'
+import {calculatePrice,setCart,getCart} from '../utils'
 import {Link} from 'react-router-dom'
 import Strapi from 'strapi-sdk-javascript/build/main'
 const apiUrl = process.env.API_URL || 'http://localhost:1337'
