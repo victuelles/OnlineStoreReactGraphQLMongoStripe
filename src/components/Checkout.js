@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 //prettier-ignore
 import {Container,Box,Heading,TextField,Text,Modal,Spinner,Button} from 'gestalt'
+import {Elements, StripeProvider, CardElement,injectStripe} from 'react-stripe-elements'
 import ToastMessage from './ToastMessage'
 import {getCart,calculatePrice} from '../utils'
 
-class Checkout extends Component{
+class _CheckoutForm extends Component{
     state ={
         cartItems:[],
         address:'',
@@ -133,6 +134,8 @@ class Checkout extends Component{
                             placeholder="Confirmation Email Address"
                             onChange={this.handleChange}
                         />
+                       {/*  Credit card element */}
+                       <CardElement id="stripe__input" onReady={input=>input.focus} />
                         <button id="stripe__button" type="submit">Submit</button>
                     </form>
                     </React.Fragment>:(
@@ -204,6 +207,16 @@ const ConfirmationModal=({orderProcessing,cartItems,closeModal,handleSubmitOrder
   <Spinner show ={orderProcessing} accessibilityLabel="Order Processing Spinner"/>
   {orderProcessing && <Text align="center" italic>Submitting order...</Text>}
     </Modal>
+)
+
+const CheckoutForm=injectStripe(_CheckoutForm)
+
+const Checkout=()=>(
+    <StripeProvider apiKey="pk_test_qvtf5iE8dnnCdXF3m2w5xc62">
+        <Elements>
+            <CheckoutForm/>
+        </Elements>
+    </StripeProvider>
 )
 
 export default Checkout
