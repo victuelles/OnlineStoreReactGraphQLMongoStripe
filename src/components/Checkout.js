@@ -1,16 +1,24 @@
 import React, { Component } from 'react'
 //prettier-ignore
-import {Container,Box,Heading,TextField} from 'gestalt'
+import {Container,Box,Heading,TextField,Text,Modal,Spinner,Button} from 'gestalt'
 import ToastMessage from './ToastMessage'
+import {getCart,calculatePrice} from '../utils'
 
 class Checkout extends Component{
     state ={
+        cartItems:[],
         address:'',
         postalCode:'',
         city:'',
         confirmationEmailAddress:'',
         toast:false,
-        toastMessage:''
+        toastMessage:'',
+        orderProcessing:false,
+        modal:false
+    }
+
+    componentDidMount(){
+        this.setState({cartItems:getCart()})
     }
 
     handleChange=({event,value})=>{
@@ -26,8 +34,13 @@ class Checkout extends Component{
             this.showToast('Fill in all fields')
             return
         }
+        this.setState({modal:true})
 
     }
+
+
+    handleSubmitOrder=()=>{}
+
     isFormEmpty=({address,postalCode,city,confirmationEmailAddress})=>{
         return !address || !postalCode || !city|| !confirmationEmailAddress 
     }
@@ -36,8 +49,12 @@ class Checkout extends Component{
         setTimeout(()=>this.setState({toast:false,toastMessage:''}),5000)
 
     }
+
+    closeModal=()=>this.setState({modal:false})
+
     render() {
-        const {toast, toastMessage} = this.state
+        //prettier-ignore
+        const {toast, toastMessage,cartItems,modal,orderProcessing} = this.state
         return(
             <Container>
                 <Box 
@@ -47,7 +64,35 @@ class Checkout extends Component{
                     shape="rounded"
                     display="flex"
                     justifyContent="center"
+                    alignItems="center"
+                    direction="column"
                     >
+                   {/* Checkout Form Heading */}
+                   <Heading color="midnight">Checkout</Heading>
+                  {/*   Conditional render */}
+                  {cartItems.length >0 ? <React.Fragment>
+
+                   {/*  User Cart */}
+                   <Box 
+                       display="flex"
+                       justifyContent="center"
+                       alignItems="center"
+                       direction="column"
+                       marginTop={2}
+                       marginBottom={6}
+                   >
+                        <Text color="darkGray" italic>{cartItems.length} item(s) for Checkout</Text>
+                        <Box padding={2}>
+                            {cartItems.map(item=>(
+                                <Box key={item._id} padding={1}>
+                                    <Text color="midnight">
+                                        {item.name} x {item.quantity} - ${(item.quantity * item.price).toFixed(2)}
+                                    </Text>
+                                </Box>
+                            ))}
+                        </Box>
+                        <Text bold>Total Amount: {calculatePrice(cartItems)}</Text>
+                   </Box>
                     {/* Checkout Form */}
                     <form style={{
                         display:'inlineBlock',
@@ -56,8 +101,6 @@ class Checkout extends Component{
                     }}
                     onSubmit={this.handleConfirmOrder}
                     >
-                        {/* Checkout Form Heading */}
-                        <Heading color="midnight">Let's get started!</Heading>
                         {/* Shipping Address Input */}
                         <TextField 
                             id="address"
@@ -92,11 +135,75 @@ class Checkout extends Component{
                         />
                         <button id="stripe__button" type="submit">Submit</button>
                     </form>
+                    </React.Fragment>:(
+                        //default text if no items in the cart
+                        <Box color="darkWash" shape ="rounded" padding={4}>
+                            <Heading align="center" color="watermelon"  size="xs">Your Cart is empty</Heading>
+                            <Text align="center" color="green">Add some brews</Text>
+                        </Box>
+
+                    )}
                 </Box>
+                {modal && 
+                    (<ConfirmationModal orderProcessing={orderProcessing} cartItems={cartItems} closeModal={this.closeModal} handleSubmitOrder={this.handleSubmitOrder}/>
+                    )
+                }
                 <ToastMessage    show={toast} message={toastMessage}/>
             </Container>
         )
     }
 }
+const ConfirmationModal=({orderProcessing,cartItems,closeModal,handleSubmitOrder})=>(
+    <Modal
+    accessibilityCloseLabel="close"
+    accessibilityModalLabel="Confirm your order"
+    heading="Confirm Your Order"
+    onDismiss={closeModal}
+    footer={
+        <Box display="flex" marginRight={-1} marginLeft={-1} justifyContent="center">
+            <Box padding={1}>
+                <Button
+                    size="lg"
+                    color="red"
+                    text="Submit"
+                    disabled={orderProcessing}
+                    onClick={handleSubmitOrder}
+                />
+            </Box>
+            <Box padding={1}>
+                <Button
+                    size="lg"
+                    text="Cancel"
+                    disabled={orderProcessing}
+                    onClick={closeModal}
+                />
+            </Box>
+        </Box>
+    }
+    role="alertdialog"
+    size="sm"
+    >
+{/*     Order Summary */}
+{!orderProcessing&&(
+    <Box display="flex" justifyContent="center" alignItems="center" direction="column" padding={2} color="lightWash">
+    {cartItems.map(item=>(
+        <Box key={item._id} padding={1}>
+            <Text size="lg" color="red">
+                {item.name} x {item.quantity} - ${(item.quantity * item.price).toFixed(2)}
+            </Text>
+        </Box>
+    ))}
+    <Box paddingY={2}>
+        <Text size="lg" bold>
+            Total:{calculatePrice(cartItems)}
+        </Text>
+    </Box>
+    </Box>
+    )}
+  {/*   Order Processing Spinner */}
+  <Spinner show ={orderProcessing} accessibilityLabel="Order Processing Spinner"/>
+  {orderProcessing && <Text align="center" italic>Submitting order...</Text>}
+    </Modal>
+)
 
 export default Checkout
