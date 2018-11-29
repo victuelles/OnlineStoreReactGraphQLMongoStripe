@@ -11,6 +11,7 @@ class Landing extends Component{
         brands:[],
         searchTerm:'',
         loading:true
+       
     }
 
     async componentDidMount(){
@@ -20,9 +21,8 @@ class Landing extends Component{
                 query:`query{
                     brands{
                       _id
-                          name
+                      name
                       description
-                      createdAt
                       image{
                         name
                         url
@@ -44,11 +44,11 @@ class Landing extends Component{
 
     handleChange=({value})=>{
 
-        this.setState({searchTerm:value})
+        this.setState({searchTerm:value},()=>this.searchBrands())
 
     }
 
-    filterBrands=({searchTerm,brands})=>{
+   /*  filterBrands=({searchTerm,brands})=>{
        return brands.filter(brand=>{
             return (
                     brand.name.toLowerCase().includes(searchTerm.toLowerCase())||
@@ -56,9 +56,35 @@ class Landing extends Component{
             )
         })
 
+    } */
+
+    searchBrands= async () => {
+        const response= await strapi.request('POST','/graphql',{
+            data:{
+                query:` query {
+                    brands(where:{
+                        name_contains:"${this.state.searchTerm}"
+                    }){
+                        _id
+                        name
+                        description
+                        image{
+                            name
+                            url
+                        }
+                    }
+                }`
+            }
+        })
+
+      /*   console.log(this.state.searchTerm, response.data.brands)*/
+        this.setState({brands:response.data.brands, 
+        loading:false})
     }
+
+
     render() {
-        const {searchTerm,loading} =this.state
+        const {searchTerm,loading,brands} =this.state
         return(
          <Container>
             {/*Brands Search field */}
@@ -99,7 +125,7 @@ class Landing extends Component{
             >
             {/* Brands */}
                 <Box wrap display="flex" justifyContent="around" >
-                    {this.filterBrands(this.state).map(brand=>(
+                    {brands.map(brand=>(
                         <Box paddingY={4} margin={2} width={200} key={brand._id}>
                             <Card
                                 image={
